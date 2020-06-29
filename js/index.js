@@ -149,6 +149,7 @@
 				let group = CREATOR.create.svg('g', {name: i + k * MEASURE_BEATS + 1, stroke: 'black', fill: fillColor, filled: filled}, svg);
 				let circle = CREATOR.create.svg('ellipse', {cx: cx, cy: cy + '%', ry: SPACE_SIZE/2.5 + '%', 'stroke-width': NOTE_STROKE_WIDTH}, group);
 				let circleRadius = circle.getBoundingClientRect().height / 2;
+				circle.setAttribute('rx', circleRadius);
 				let svgWidth = svg.getBoundingClientRect().width;
 				let deltaX = (circleRadius * 100) / svgWidth;
 				if (line) {
