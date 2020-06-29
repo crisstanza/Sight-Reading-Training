@@ -52,16 +52,19 @@
 	}
 
 	function highlightLastNote(beat) {
+		let noteIndex;
 		if (beat > 0) {
-			let noteIndex = Math.min(Math.floor(beat), NOTES.length) - 1;
-			let note = NOTES[noteIndex];
-			let filled = note.getAttribute('filled');
-			note.setAttribute('stroke', 'red');
-			if (filled == 'true') {
-				note.setAttribute('fill', '#FF3737');
-			} else {
-				note.setAttribute('fill', '#FFF7F7');
-			}
+			noteIndex = Math.min(Math.floor(beat), NOTES.length) - 1;
+		} else {
+			noteIndex = 0;
+		}
+		let note = NOTES[noteIndex];
+		let filled = note.getAttribute('filled');
+		note.setAttribute('stroke', 'red');
+		if (filled == 'true') {
+			note.setAttribute('fill', '#FF3737');
+		} else {
+			note.setAttribute('fill', '#FFF7F7');
 		}
 	}
 

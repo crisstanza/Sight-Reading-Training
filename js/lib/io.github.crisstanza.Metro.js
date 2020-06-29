@@ -9,7 +9,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 	function newAudio(name) {
 		let audio = new Audio('audio/' + name + '.mp3');
 		audio.preload = true;
-		audio.addEventListener('ended', function() { console.log(audio); AUDIO_POOL[name].push(audio); });
+		audio.addEventListener('ended', function() { AUDIO_POOL[name].push(audio); });
 		return audio;
 	}
 
@@ -25,6 +25,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 		this.measureBeats = measureBeats;
 		this.speed = speed;
 		this.beat = 0;
+		this.lastBeat = 0;
 		this.maxBeat = measureCount * measureBeats + 1;
 	};
 
@@ -36,6 +37,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 
 	io.github.crisstanza.Metro.prototype.init = function() {
 		this.beat = -4;
+		this.lastBeat = 0;
 		this.delay = (60 / this.speed) * 1000;
 	};
 
@@ -45,6 +47,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 				let audio = this.findCurrentAudio();
 				this.notifyCallback('willPlay');
 				audio.play();
+				this.lastBeat = this.beat;
 				this.notifyCallback('justPlayed');
 				let _this = this;
 				setTimeout(function() { _this.play() }, this.delay);
@@ -92,9 +95,9 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 			} else if (event == 'justPlayed') {
 				this.callback.justPlayed(this.beat);
 			} else if (event == 'willStop') {
-				this.callback.willStop(this.beat);
+				this.callback.willStop(this.lastBeat);
 			} else if (event == 'justStopped') {
-				this.callback.justStopped(this.beat);
+				this.callback.justStopped(this.lastBeat);
 			}
 		}
 	};
