@@ -12,4 +12,4 @@ div.metro-control button { font-family: inherit; }
 div.metro-control label { font-size: 0.9em }
 div.metro-control label input[type="checkbox"] { vertical-align: text-top; margin-left: 20px; margin-right: 0px; }
 
-div.octocat-icon { position: relative; bottom: 33px; text-align: center; }
+div.footer { position: relative; bottom: 37px; text-align: center; opacity: 0.5; }
