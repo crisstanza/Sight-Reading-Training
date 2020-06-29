@@ -6,6 +6,19 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 
 (function() {
 
+	function newAudio(name) {
+		let audio = new Audio('audio/' + name + '.mp3');
+		audio.preload = true;
+		audio.addEventListener('ended', function() { console.log(audio); AUDIO_POOL[name].push(audio); });
+		return audio;
+	}
+
+	let AUDIO_POOL = {
+		'0.5': [ newAudio('0.5') ],
+		'1': [ newAudio('1') ],
+		'234': [ newAudio('234') ]
+	};
+
 	io.github.crisstanza.Metro = function(callback, measureCount, measureBeats, speed) {
 		this.callback = callback;
 		this.measureCount = measureCount;
@@ -29,7 +42,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 	io.github.crisstanza.Metro.prototype.play = function() {
 		if (this.beat != 0) {
 			if (this.beat < this.maxBeat) {
-				let audio = new Audio('audio/' + this.findCurrentAudio() + '.mp3');
+				let audio = this.findCurrentAudio();
 				this.notifyCallback('willPlay');
 				audio.play();
 				this.notifyCallback('justPlayed');
@@ -57,13 +70,15 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 	};
 
 	io.github.crisstanza.Metro.prototype.findCurrentAudio = function() {
+		let name;
 		if (this.beat < 0 || this.beat % 1 == 0.5) {
-			return '0.5';
-		} if (this.beat % this.measureBeats == 1) {
-			return '1';
+			name = '0.5';
+		} else if (this.beat % this.measureBeats == 1) {
+			name = '1';
 		} else {
-			return '234';
+			name = '234';
 		}
+		return AUDIO_POOL[name].pop() || newAudio(name);
 	};
 
 	io.github.crisstanza.Metro.prototype.notifyCallback = function(event) {
