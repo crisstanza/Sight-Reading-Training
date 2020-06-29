@@ -6,6 +6,9 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 
 (function() {
 
+	let MIN_MEASURES = 1;
+	let MAX_MEASURES = 8;
+
 	function newAudio(name) {
 		let audio = new Audio('audio/' + name + '.mp3');
 		audio.preload = true;
@@ -19,26 +22,28 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 		'234': [ newAudio('234') ]
 	};
 
-	io.github.crisstanza.Metro = function(callback, measureCount, measureBeats, speed) {
+	io.github.crisstanza.Metro = function(callback, measureCount, measureBeats) {
 		this.callback = callback;
 		this.measureCount = measureCount;
 		this.measureBeats = measureBeats;
-		this.speed = speed;
 		this.beat = 0;
 		this.lastBeat = 0;
-		this.maxBeat = measureCount * measureBeats + 1;
 	};
 
-	io.github.crisstanza.Metro.prototype.gui = function(btStart, btStop, cbRepeat) {
+	io.github.crisstanza.Metro.prototype.gui = function(inSpeed, btStart, btStop, cbRepeat, btDelMeasure, btAddMeasure) {
+		this.inSpeed = inSpeed;
 		this.btStart = btStart;
 		this.btStop = btStop;
 		this.cbRepeat = cbRepeat;
+		this.btDelMeasure = btDelMeasure;
+		this.btAddMeasure = btAddMeasure;
 	};
 
 	io.github.crisstanza.Metro.prototype.init = function() {
 		this.beat = -4;
-		this.lastBeat = 0;
-		this.delay = (60 / this.speed) * 1000;
+		this.lastBeat = null;
+		this.maxBeat = this.measureCount * this.measureBeats + 1;
+		this.delay = (60 / this.inSpeed.value) * 1000;
 	};
 
 	io.github.crisstanza.Metro.prototype.play = function() {
@@ -89,20 +94,52 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 			if (event == 'willStart') {
 				this.callback.willStart(this.beat);
 			} else if (event == 'justStarted') {
-				this.callback.justStarted(this.beat);
+				this.callback.justStarted(this.lastBeat);
+
 			} else if (event == 'willPlay') {
 				this.callback.willPlay(this.beat);
 			} else if (event == 'justPlayed') {
-				this.callback.justPlayed(this.beat);
+				this.callback.justPlayed(this.lastBeat);
+
 			} else if (event == 'willStop') {
-				this.callback.willStop(this.lastBeat);
+				this.callback.willStop(this.beat);
 			} else if (event == 'justStopped') {
 				this.callback.justStopped(this.lastBeat);
+
+			} else if (event == 'justDeletedMeasure') {
+				this.callback.justDeletedMeasure(this.measureCount);
+			} else if (event == 'justAddedMeasure') {
+				this.callback.justAddedMeasure(this.measureCount);
 			}
 		}
 	};
 
+	io.github.crisstanza.Metro.prototype.btDelMeasure_OnClick = function(event) {
+		if (this.measureCount > MIN_MEASURES) {
+			this.measureCount--;
+			this.notifyCallback('justDeletedMeasure');
+			this.btAddMeasure.removeAttribute('disabled');
+		}
+		if (this.measureCount <= MIN_MEASURES) {
+			this.btDelMeasure.setAttribute('disabled', 'disabled');
+		}
+	};
+
+	io.github.crisstanza.Metro.prototype.btAddMeasure_OnClick = function(event) {
+		if (this.measureCount < MAX_MEASURES) {
+			this.measureCount++;
+			this.notifyCallback('justAddedMeasure');
+			this.btDelMeasure.removeAttribute('disabled');
+		}
+		if (this.measureCount >= MAX_MEASURES) {
+			this.btAddMeasure.setAttribute('disabled', 'disabled');
+		}
+	};
+
 	io.github.crisstanza.Metro.prototype.btStart_OnClick = function(event) {
+		this.btDelMeasure.setAttribute('disabled', 'disabled');
+		this.btAddMeasure.setAttribute('disabled', 'disabled');
+		this.inSpeed.setAttribute('disabled', 'disabled');
 		this.btStart.setAttribute('disabled', 'disabled');
 		this.btStop.removeAttribute('disabled');
 		this.start();
@@ -118,6 +155,13 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 	};
 
 	io.github.crisstanza.Metro.prototype.btStop_OnClick = function(event) {
+		if (this.measureCount > MIN_MEASURES) {
+			this.btDelMeasure.removeAttribute('disabled');
+		}
+		if (this.measureCount < MAX_MEASURES) {
+			this.btAddMeasure.removeAttribute('disabled');
+		}
+		this.inSpeed.removeAttribute('disabled');
 		this.btStart.removeAttribute('disabled');
 		this.btStop.setAttribute('disabled', 'disabled');
 		this.stop();

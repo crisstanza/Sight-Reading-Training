@@ -1,7 +1,5 @@
 (function() {
 
-	let SPEED = 60;
-
 	let SPACE_SIZE = 6;
 	let MEASURE_COUNT = 4;
 	let MEASURE_SIZE = 100 / MEASURE_COUNT;
@@ -21,6 +19,12 @@
 
 	let METRO, CREATOR;
 	let NOTES, EXTRA_LINES;
+
+	function updateGlobals(measureCount) {
+		MEASURE_COUNT = measureCount;
+		MEASURE_SIZE = 100 / MEASURE_COUNT;
+		BEAT_SIZES = MEASURE_SIZE / (MEASURE_BEATS + 1);
+	}
 
 	function drawBars(startY) {
 		let delta = SPACE_SIZE/4;
@@ -71,7 +75,8 @@
 	function highlightNote(beat) {
 		if (beat > 0) {
 			if (beat % 1 == 0) {
-				let note = NOTES[beat - 1];
+				let noteIndex = Math.min(beat, NOTES.length) - 1;
+				let note = NOTES[noteIndex];
 				let filled = note.getAttribute('filled');
 				note.setAttribute('stroke', 'green');
 				if (filled == 'true') {
@@ -80,7 +85,7 @@
 					note.setAttribute('fill', '#DDF5DD');
 				}
 				if (beat > 1) {
-					let previousNote = NOTES[beat - 2];
+					let previousNote = NOTES[noteIndex - 1];
 					let previousFilled = previousNote.getAttribute('filled');
 					previousNote.setAttribute('stroke', 'black');
 					if (previousFilled == 'true') {
@@ -95,8 +100,6 @@
 
 	function init(event) {
 		CREATOR = io.github.crisstanza.ElementsCreator;
-		drawLines(START_Y_1);
-		drawLines(START_Y_2);
 		let callback = {
 			willStart: function(beat) {
 				drawNotes();
@@ -104,20 +107,40 @@
 			},
 			justStarted: function(beat) {
 			},
+
 			willPlay: function(beat) {
 				highlightNote(beat);
 			},
 			justPlayed: function(beat) {
 			},
+
 			willStop: function(beat) {
 				highlightLastNote(beat);
 			},
 			justStopped: function(beat) {
+			},
+
+			justDeletedMeasure: function(measureCount) {
+				updateGlobals(measureCount);
+				drawEmptyStaff();
+			},
+			justAddedMeasure: function(measureCount) {
+				updateGlobals(measureCount);
+				drawEmptyStaff();
 			}
 		};
-		METRO = new io.github.crisstanza.Metro(callback, MEASURE_COUNT, MEASURE_BEATS, SPEED);
-		METRO.gui(btStart, btStop, cbRepeat);
+		METRO = new io.github.crisstanza.Metro(callback, MEASURE_COUNT, MEASURE_BEATS);
+		METRO.gui(inSpeed, btStart, btStop, cbRepeat, btDelMeasure, btAddMeasure);
 		io.github.crisstanza.Autos.initButtons(METRO);
+		drawEmptyStaff();
+	}
+
+	function drawEmptyStaff() {
+		var range = document.createRange();
+		range.selectNodeContents(svg);
+		range.deleteContents();
+		drawLines(START_Y_1);
+		drawLines(START_Y_2);
 	}
 
 	function drawNotes() {

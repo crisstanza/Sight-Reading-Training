@@ -11,12 +11,17 @@
 	</head>
 	<body data-autos="ids">
 		<div class="metro-control">
+			<label>
+				<input id="in-speed" type="number" value="60" maxlength="3"> bpm
+			</label>
 			<button id="bt-start">start</button>
 			<button id="bt-stop" disabled="disabled">stop</button>
 			<label>
 				<input id="cb-repeat" type="checkbox"> repeat
 			</label>
 		</div>
+		<button class="measure-del" id="bt-del-measure">-</button>
+		<button class="measure-add" id="bt-add-measure">+</button>
 		<svg id="svg" />
 		<div class="footer">
 			<a href="//github.com/crisstanza/Sight-Reading-Training/" target="_blank" title="GitHub">
