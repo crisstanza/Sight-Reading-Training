@@ -38,6 +38,40 @@ if (!io.github.crisstanza.Autos) io.github.crisstanza.Autos = {};
 		return elements;
 	};
 
+	io.github.crisstanza.Autos.initNames = function() {
+		let elements = document.querySelectorAll('[name]:not([name=""])');
+		if (elements) {
+			let length = elements.length;
+			for (let i = 0 ; i < length ; i++) {
+				let element = elements[i];
+				let name = element.getAttribute('name');
+				let identifier = fixId(name);
+				if (!window[identifier]) {
+					window[identifier] = [];
+				}
+				window[identifier].push(element);
+			}
+		}
+		return elements;
+	};
+
+	io.github.crisstanza.Autos.initRadios = function(obj) {
+		let elements = document.querySelectorAll('input[type="radio"][name]:not([name=""])');
+		if (elements) {
+			let parent = obj ? 'obj.' : '';
+			let length = elements.length;
+			for (let i = 0 ; i < length ; i++) {
+				let element = elements[i];
+				let name = element.getAttribute('name');
+				let identifier = fixId(name);
+				element.addEventListener('change', function(event) {
+					eval(parent+identifier+'_OnChange(event)');
+				});
+			}
+		}
+		return elements;
+	};
+
 	function fixId(str) {
 		let parts = str.split('-');
 		let length = parts.length;

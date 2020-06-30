@@ -9,16 +9,17 @@
 		<script src="js/lib/io.github.crisstanza.Metro.js?v=1.0.0"></script>
 		<script src="js/index.js?v=1.0.0"></script>
 	</head>
-	<body data-autos="ids">
+	<body data-autos="ids, names">
 		<div class="metro-control">
-			<label>
-				<input id="in-speed" type="number" value="60" maxlength="3"> bpm
+			<label class="speed"><input id="in-speed" type="number" value="60" maxlength="3" /> bpm</label>
+			<label class="buttons">
+				<button id="bt-start">start</button>
+				<button id="bt-stop" disabled="disabled">stop</button>
 			</label>
-			<button id="bt-start">start</button>
-			<button id="bt-stop" disabled="disabled">stop</button>
-			<label>
-				<input id="cb-repeat" type="checkbox"> repeat
-			</label>
+			<label class="beats"><input name="rb-beats" type="radio" value="3" /> 3</label>
+			<label class="beats"><input name="rb-beats" type="radio" value="4" checked="checked" /> 4</label>
+			<label class="beats"><input name="rb-beats" type="radio" value="8" /> 8</label>
+			<label class="repeat"><input id="cb-repeat" type="checkbox" /> repeat</label>
 		</div>
 		<button class="measure-del" id="bt-del-measure">-</button>
 		<button class="measure-add" id="bt-add-measure">+</button>

@@ -30,10 +30,11 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 		this.lastBeat = 0;
 	};
 
-	io.github.crisstanza.Metro.prototype.gui = function(inSpeed, btStart, btStop, cbRepeat, btDelMeasure, btAddMeasure) {
+	io.github.crisstanza.Metro.prototype.gui = function(inSpeed, btStart, btStop, rbBeats, cbRepeat, btDelMeasure, btAddMeasure) {
 		this.inSpeed = inSpeed;
 		this.btStart = btStart;
 		this.btStop = btStop;
+		this.rbBeats = rbBeats;
 		this.cbRepeat = cbRepeat;
 		this.btDelMeasure = btDelMeasure;
 		this.btAddMeasure = btAddMeasure;
@@ -110,8 +111,17 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 				this.callback.justDeletedMeasure(this.measureCount);
 			} else if (event == 'justAddedMeasure') {
 				this.callback.justAddedMeasure(this.measureCount);
+
+			} else if (event == 'justChangedMeasureBeats') {
+				this.callback.justChangedMeasureBeats(this.measureBeats);
 			}
 		}
+	};
+
+	io.github.crisstanza.Metro.prototype.rbBeats_OnChange = function(event) {
+		let rbBeatsCurrent = event.target;
+		this.measureBeats = rbBeatsCurrent.value * 1;
+		this.notifyCallback('justChangedMeasureBeats');
 	};
 
 	io.github.crisstanza.Metro.prototype.btDelMeasure_OnClick = function(event) {
@@ -141,6 +151,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 		this.btAddMeasure.setAttribute('disabled', 'disabled');
 		this.inSpeed.setAttribute('disabled', 'disabled');
 		this.btStart.setAttribute('disabled', 'disabled');
+		this.rbBeats.forEach(function(rbBeat) { rbBeat.setAttribute('disabled', 'disabled'); });
 		this.btStop.removeAttribute('disabled');
 		this.start();
 	};
@@ -163,6 +174,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 		}
 		this.inSpeed.removeAttribute('disabled');
 		this.btStart.removeAttribute('disabled');
+		this.rbBeats.forEach(function(rbBeat) { rbBeat.removeAttribute('disabled'); });
 		this.btStop.setAttribute('disabled', 'disabled');
 		this.stop();
 	};

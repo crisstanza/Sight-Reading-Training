@@ -20,8 +20,9 @@
 	let METRO, CREATOR;
 	let NOTES, EXTRA_LINES;
 
-	function updateGlobals(measureCount) {
+	function updateGlobals(measureCount, measureBeats) {
 		MEASURE_COUNT = measureCount;
+		MEASURE_BEATS = measureBeats;
 		MEASURE_SIZE = 100 / MEASURE_COUNT;
 		BEAT_SIZES = MEASURE_SIZE / (MEASURE_BEATS + 1);
 	}
@@ -121,17 +122,23 @@
 			},
 
 			justDeletedMeasure: function(measureCount) {
-				updateGlobals(measureCount);
+				updateGlobals(measureCount, MEASURE_BEATS);
 				drawEmptyStaff();
 			},
 			justAddedMeasure: function(measureCount) {
-				updateGlobals(measureCount);
+				updateGlobals(measureCount, MEASURE_BEATS);
+				drawEmptyStaff();
+			},
+
+			justChangedMeasureBeats: function(measureBeats) {
+				updateGlobals(MEASURE_COUNT, measureBeats);
 				drawEmptyStaff();
 			}
 		};
 		METRO = new io.github.crisstanza.Metro(callback, MEASURE_COUNT, MEASURE_BEATS);
-		METRO.gui(inSpeed, btStart, btStop, cbRepeat, btDelMeasure, btAddMeasure);
+		METRO.gui(inSpeed, btStart, btStop, rbBeats, cbRepeat, btDelMeasure, btAddMeasure);
 		io.github.crisstanza.Autos.initButtons(METRO);
+		io.github.crisstanza.Autos.initRadios(METRO);
 		drawEmptyStaff();
 	}
 
