@@ -41,7 +41,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 	};
 
 	io.github.crisstanza.Metro.prototype.init = function() {
-		this.beat = -4;
+		this.beat = - this.measureBeats;
 		this.lastBeat = null;
 		this.maxBeat = this.measureCount * this.measureBeats + 1;
 		this.delay = (60 / this.inSpeed.value) * 1000;
