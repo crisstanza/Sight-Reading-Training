@@ -1,6 +1,6 @@
 (function() {
 
-	let SPACE_SIZE = 6;
+	let SPACE_SIZE = 5;
 	let MEASURE_COUNT = 4;
 	let MEASURE_SIZE = 100 / MEASURE_COUNT;
 
@@ -10,15 +10,18 @@
 	let POSSIBLE_NOTES_COUNT = 15;
 	let EXTRA_LINES_LIMITS = [1, 13];
 
-	let START_Y_2 = 50 + (50 - SPACE_SIZE * 4) / 2;
 	let START_Y_1 = (50 - SPACE_SIZE * 4) / 2;
+	let START_Y_2 = 50 + (50 - SPACE_SIZE * 4) / 2;
+
+	let MIDDLE_Y_1 = START_Y_1 + SPACE_SIZE*2;
+	let MIDDLE_Y_2 = START_Y_2 + SPACE_SIZE*2;
 
 	let LINE_STROKE_WIDTH = 2;
 	let BAR_STROKE_WIDTH = 1;
 	let NOTE_STROKE_WIDTH = 2;
 
 	let METRO, CREATOR;
-	let NOTES, EXTRA_LINES;
+	let NOTES, RESTS, EXTRA_LINES;
 
 	function updateGlobals(measureCount, measureBeats) {
 		MEASURE_COUNT = measureCount;
@@ -148,11 +151,50 @@
 		range.deleteContents();
 		drawLines(START_Y_1);
 		drawLines(START_Y_2);
+		drawRests(MIDDLE_Y_1);
+		drawRests(MIDDLE_Y_2);
+	}
+
+	function drawRests(middleY, targetK, targetI) {
+		for (let k = 0 ; k < MEASURE_COUNT ; k++) {
+			if (targetK == undefined || targetK == k) {
+				let startX = BEAT_SIZES * k * (MEASURE_BEATS + 1);
+				for (let i = 0 ; i < MEASURE_BEATS ; i++) {
+					if (targetI == undefined || targetI == i) {
+						let cx = startX + BEAT_SIZES*(i + 1);
+						let circle = CREATOR.create.svg('ellipse', {cx: cx + '%', cy: middleY + '%', ry: SPACE_SIZE + '%', 'stroke-width': NOTE_STROKE_WIDTH}, svg);
+						let circleHeight = circle.getBoundingClientRect().height;
+						let circleX = circle.getBoundingClientRect().x + circleHeight/2.5;
+						let circleY = circle.getBoundingClientRect().y + circleHeight/2.5;
+						circle.remove();
+						let pathData = changePathData('M -1 -17 L 6 -10 L 0 -2 L 6 4 Q -10 4 8 18 Q -16 2 2 2 L -4 -4 L 2 -12 L -2 -16 L -2 -17 L -1 -17', circleHeight/45, circleX, circleY);
+						let rest = CREATOR.create.svg('path', {d: pathData, fill: '#333', stroke: 'black', 'stroke-width': NOTE_STROKE_WIDTH}, svg);
+					}
+				}
+			}
+		}
+		RESTS = svg.querySelectorAll('path');
+	}
+
+	function changePathData(data, mul, x, y) {
+		let parts = data.split(' ');
+		let j = 0;
+		for (var i = 0 ; i < parts.length ; i++) {
+			let part = parts[i];
+			let number = new Number(part);
+			if (!isNaN(number)) {
+				parts[i] = number * mul + (j++ % 2 == 0 ? x : y);
+			}
+		}
+		return parts.join(' ');
 	}
 
 	function drawNotes() {
 		if (NOTES) {
 			NOTES.forEach(function(note) { note.remove(); });
+		}
+		if (RESTS) {
+			RESTS.forEach(function(rest) { rest.remove(); });
 		}
 		if (EXTRA_LINES) {
 			EXTRA_LINES.forEach(function(line) { line.remove(); });
@@ -167,6 +209,7 @@
 					fillColor = '#FFF';
 					line = false;
 					filled = false;
+					drawRests(MIDDLE_Y_1, k, i);
 				} else {
 					startY = START_Y_1;
 					fillColor = '#333';
