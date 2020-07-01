@@ -23,6 +23,14 @@
 	let METRO, CREATOR;
 	let NOTES, RESTS, EXTRA_LINES;
 
+	let COLORS = {
+		gray: {line: 'gray'},
+		black: {line: 'black', fill: '#333', empty: 'white'},
+		red: {line: 'red', fill: '#FF3737', empty: '#FFF7F7'},
+		green: {line: 'green', fill: '#009300', empty: '#DDF5DD'},
+		yellow: {line: 'orange', fill: 'orange', empty: '#FFFAF2'}
+	};
+
 	function updateGlobals(measureCount, measureBeats) {
 		MEASURE_COUNT = measureCount;
 		MEASURE_BEATS = measureBeats;
@@ -36,43 +44,50 @@
 		let y2 = startY + SPACE_SIZE*4 + delta + '%';
 		for (let i = 0 ; i < MEASURE_COUNT ; i++) {
 			let x = MEASURE_SIZE * (i + 1) + '%';
-			CREATOR.create.svg('line', {x1: x, y1: y1, x2: x, y2: y2, stroke: 'gray', 'stroke-width': BAR_STROKE_WIDTH}, svg);
+			CREATOR.create.svg('line', {x1: x, y1: y1, x2: x, y2: y2, stroke: COLORS.gray.line, 'stroke-width': BAR_STROKE_WIDTH}, svg);
 		}
 	}
 
 	function drawLines(startY) {
 		for (let i = 0 ; i < 5 ; i++) {
 			let y = startY + SPACE_SIZE*i + '%';
-			CREATOR.create.svg('line', {x1: 0, y1: y, x2: '100%', y2: y, stroke: 'black', 'stroke-width': LINE_STROKE_WIDTH}, svg);
+			CREATOR.create.svg('line', {x1: 0, y1: y, x2: '100%', y2: y, stroke: COLORS.black.line, 'stroke-width': LINE_STROKE_WIDTH}, svg);
 		}
 		drawBars(startY);
 	}
 
+	function changeColor(color, elements) {
+		elements.forEach(function(element) {
+			let filled = element.getAttribute('filled');
+			element.setAttribute('stroke', color.line);
+			if (filled == 'true') {
+				element.setAttribute('fill', color.fill);
+			} else {
+				element.setAttribute('fill', color.empty);
+			}
+		});
+	}
+
 	function highlightFirstNote() {
-		let note = NOTES[0];
-		let filled = note.getAttribute('filled');
-		note.setAttribute('stroke', 'orange');
-		if (filled == 'true') {
-			note.setAttribute('fill', '#FEFE08');
-		} else {
-			note.setAttribute('fill', '#FFFAF2');
-		}
+		changeColor(COLORS.yellow, [NOTES[0], RESTS[0]]);
 	}
 
 	function highlightLastNote(beat) {
-		let noteIndex;
+		let noteIndex, restIndex;
 		if (beat > 0) {
 			noteIndex = Math.min(Math.floor(beat), NOTES.length) - 1;
+			if (Math.floor(beat) % MEASURE_BEATS == 0) {
+				restIndex = Math.min(Math.floor(beat / MEASURE_BEATS), RESTS.length - 1);
+			} else {
+				restIndex = -1;
+			}
 		} else {
 			noteIndex = 0;
+			restIndex = 0;
 		}
-		let note = NOTES[noteIndex];
-		let filled = note.getAttribute('filled');
-		note.setAttribute('stroke', 'red');
-		if (filled == 'true') {
-			note.setAttribute('fill', '#FF3737');
-		} else {
-			note.setAttribute('fill', '#FFF7F7');
+		changeColor(COLORS.red, [NOTES[noteIndex]]);
+		if (restIndex >= 0) {
+			changeColor(COLORS.red, [RESTS[restIndex]]);
 		}
 	}
 
@@ -80,25 +95,27 @@
 		if (beat > 0) {
 			if (beat % 1 == 0) {
 				let noteIndex = Math.min(beat, NOTES.length) - 1;
-				let note = NOTES[noteIndex];
-				let filled = note.getAttribute('filled');
-				note.setAttribute('stroke', 'green');
-				if (filled == 'true') {
-					note.setAttribute('fill', '#009300');
-				} else {
-					note.setAttribute('fill', '#DDF5DD');
-				}
+				changeColor(COLORS.green, [NOTES[noteIndex]]);
 				if (beat > 1) {
-					let previousNote = NOTES[noteIndex - 1];
-					let previousFilled = previousNote.getAttribute('filled');
-					previousNote.setAttribute('stroke', 'black');
-					if (previousFilled == 'true') {
-						previousNote.setAttribute('fill', '#333');
-					} else {
-						previousNote.setAttribute('fill', '#FFF');
-					}
+					changeColor(COLORS.black, [NOTES[noteIndex - 1]]);
+				}
+				if (beat % MEASURE_BEATS == 1) {
+					let restIndex = Math.min(Math.floor(beat / MEASURE_BEATS), RESTS.length - 1);
+					changeColor(COLORS.green, [RESTS[restIndex]]);
+				}
+				if (beat % MEASURE_BEATS == 2) {
+					let restIndex = Math.min(Math.floor(beat / MEASURE_BEATS), RESTS.length - 1);
+					changeColor(COLORS.black, [RESTS[restIndex]]);
 				}
 			}
+		}
+	}
+
+	function refresh(event) {
+		if (NOTES) {
+			drawNotes();
+		} else {
+			drawEmptyStaff();
 		}
 	}
 
@@ -168,7 +185,7 @@
 						let circleY = circle.getBoundingClientRect().y + circleHeight/2.5;
 						circle.remove();
 						let pathData = changePathData('M -1 -17 L 6 -10 L 0 -2 L 6 4 Q -10 4 8 18 Q -16 2 2 2 L -4 -4 L 2 -12 L -2 -16 L -2 -17 L -1 -17', circleHeight/45, circleX, circleY);
-						let rest = CREATOR.create.svg('path', {d: pathData, fill: '#333', stroke: 'black', 'stroke-width': NOTE_STROKE_WIDTH}, svg);
+						let rest = CREATOR.create.svg('path', {d: pathData, fill: COLORS.black.fill, stroke: COLORS.black.line, 'stroke-width': NOTE_STROKE_WIDTH, filled: true}, svg);
 					}
 				}
 			}
@@ -206,20 +223,20 @@
 				let startY, fillColor, line, filled;
 				if (i == 0) {
 					startY = START_Y_2;
-					fillColor = '#FFF';
+					fillColor = COLORS.black.empty;
 					line = false;
 					filled = false;
 					drawRests(MIDDLE_Y_1, k, i);
 				} else {
 					startY = START_Y_1;
-					fillColor = '#333';
+					fillColor = COLORS.black.fill;
 					line = true;
 					filled = true;
 				}
 				let cx = startX + BEAT_SIZES*(i + 1) + '%';
 				let cy = (startY - SPACE_SIZE*1.5) + (SPACE_SIZE/2)*j;
 				let y1 = cy;
-				let group = CREATOR.create.svg('g', {name: i + k * MEASURE_BEATS + 1, stroke: 'black', fill: fillColor, filled: filled}, svg);
+				let group = CREATOR.create.svg('g', {name: i + k * MEASURE_BEATS + 1, stroke: COLORS.black.line, fill: fillColor, filled: filled}, svg);
 				let circle = CREATOR.create.svg('ellipse', {cx: cx, cy: cy + '%', ry: SPACE_SIZE/2.5 + '%', 'stroke-width': NOTE_STROKE_WIDTH}, group);
 				let circleRadius = circle.getBoundingClientRect().height / 2;
 				circle.setAttribute('rx', circleRadius);
@@ -245,7 +262,7 @@
 					} else {
 						deltaY = 0;
 					}
-					CREATOR.create.svg('line', {x1: x1, y1: y1 + deltaY + '%', x2: x2, y2: y1 + deltaY + '%', stroke: 'black', 'stroke-width': LINE_STROKE_WIDTH, name: 'extra'}, svg);
+					CREATOR.create.svg('line', {x1: x1, y1: y1 + deltaY + '%', x2: x2, y2: y1 + deltaY + '%', stroke: COLORS.black.line, 'stroke-width': LINE_STROKE_WIDTH, name: 'extra'}, svg);
 				}
 				group.remove();
 				svg.appendChild(group);
@@ -255,16 +272,10 @@
 		EXTRA_LINES = svg.querySelectorAll('line[name="extra"]');
 	}
 
-	function window_HashChange(event) {
-		var hash = document.location.hash;
-		console.log(hash);
-	}
-
-	function window_Load(event) {
-		init(event);
-	}
+	function window_Load(event) { init(event); }
+	function window_Resize(event) { refresh(event); }
 
 	window.addEventListener('load', window_Load);
-	window.addEventListener('hashchange', window_HashChange);
+	window.addEventListener('resize', window_Resize);
 
 })();
