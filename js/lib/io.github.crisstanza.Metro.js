@@ -30,21 +30,22 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 		this.lastBeat = 0;
 	};
 
-	io.github.crisstanza.Metro.prototype.gui = function(inSpeed, btStart, btStop, rbBeats, cbRepeat, btDelMeasure, btAddMeasure) {
+	io.github.crisstanza.Metro.prototype.gui = function(inSpeed, btStart, btStop, rbBeats, cbIntro, cbRepeat, btDelMeasure, btAddMeasure) {
 		this.inSpeed = inSpeed;
 		this.btStart = btStart;
 		this.btStop = btStop;
 		this.rbBeats = rbBeats;
+		this.cbIntro = cbIntro;
 		this.cbRepeat = cbRepeat;
 		this.btDelMeasure = btDelMeasure;
 		this.btAddMeasure = btAddMeasure;
 	};
 
 	io.github.crisstanza.Metro.prototype.init = function() {
-		this.beat = - this.measureBeats;
+		this.beat = this.cbIntro.checked ? - this.measureBeats : 1;
 		this.lastBeat = null;
 		this.maxBeat = this.measureCount * this.measureBeats + 1;
-		this.delay = (60 / this.inSpeed.value) * 1000;
+		this.delay = (60 / this.inSpeed.value) * 1000 * (this.cbIntro.checked ? 1 : 0.5);
 	};
 
 	io.github.crisstanza.Metro.prototype.play = function() {
@@ -56,7 +57,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 				this.lastBeat = this.beat;
 				this.notifyCallback('justPlayed');
 				let _this = this;
-				setTimeout(function() { _this.play() }, this.delay);
+				setTimeout(function() { _this.play(); }, this.delay);
 				this.incBeat();
 			} else {
 				this.btStop_OnClick();

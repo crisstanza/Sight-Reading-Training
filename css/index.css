@@ -15,7 +15,7 @@ div.metro-control label input[type="checkbox"], div.metro-control label input[ty
 div.metro-control label input[type="number"] { width: 50px; margin-right: -1px; }
 div.metro-control label input[type="number"]:not([disabled="disabled"]) { color: inherit; }
 
-div.metro-control label.speed, div.metro-control label.buttons { margin-right: 25px; }
+div.metro-control label.speed, div.metro-control label.buttons, div.metro-control label.intro { margin-right: 25px; }
 div.metro-control label.repeat { margin-left: 25px; }
 
 div.footer { position: relative; bottom: 37px; text-align: center; opacity: 0.5; }

@@ -156,7 +156,7 @@
 			}
 		};
 		METRO = new io.github.crisstanza.Metro(callback, MEASURE_COUNT, MEASURE_BEATS);
-		METRO.gui(inSpeed, btStart, btStop, rbBeats, cbRepeat, btDelMeasure, btAddMeasure);
+		METRO.gui(inSpeed, btStart, btStop, rbBeats, cbIntro, cbRepeat, btDelMeasure, btAddMeasure);
 		io.github.crisstanza.Autos.initButtons(METRO);
 		io.github.crisstanza.Autos.initRadios(METRO);
 		drawEmptyStaff();
