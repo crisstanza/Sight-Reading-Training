@@ -195,7 +195,7 @@
 						let circleX = circle.getBoundingClientRect().x + circleHeight/2.5;
 						let circleY = circle.getBoundingClientRect().y + circleHeight/2.5;
 						circle.remove();
-						let pathData = changePathData('M -1 -17 L 6 -10 L 0 -2 L 6 4 Q -10 4 8 18 Q -16 2 2 2 L -4 -4 L 2 -12 L -2 -16 L -2 -17 L -1 -17', circleHeight/45, circleX, circleY);
+						let pathData = changePathData('M -1 -17 L 6 -10 L 0 -2 L 6 4 Q -10 4 8 18 Q -16 2 2 2 L -4 -4 L 2 -12 L -2 -16 L -2 -17 L -1 -17 L 0 -16', circleHeight/45, circleX, circleY);
 						let rest = CREATOR.create.svg('path', {d: pathData, fill: COLORS.black.fill, stroke: COLORS.black.line, 'stroke-width': NOTE_STROKE_WIDTH, filled: true}, svg);
 					}
 				}
