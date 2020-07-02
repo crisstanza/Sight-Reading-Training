@@ -7,8 +7,9 @@
 	let MEASURE_BEATS = 4;
 	let BEAT_SIZES = MEASURE_SIZE / (MEASURE_BEATS + 1);
 
-	let POSSIBLE_NOTES_COUNT = 15;
-	let EXTRA_LINES_LIMITS = [1, 13];
+	let EXTRA_LINES_COUNT = 2;
+	let POSSIBLE_NOTES_COUNT = 11 + EXTRA_LINES_COUNT * 4;
+	let EXTRA_LINES_LIMITS = [EXTRA_LINES_COUNT * 2 - 1, 11 + EXTRA_LINES_COUNT * 2];
 
 	let START_Y_1 = (50 - SPACE_SIZE * 4) / 2;
 	let START_Y_2 = 50 + (50 - SPACE_SIZE * 4) / 2;
@@ -42,7 +43,7 @@
 		let delta = SPACE_SIZE/4;
 		let y1 = startY + SPACE_SIZE*0 - delta + '%';
 		let y2 = startY + SPACE_SIZE*4 + delta + '%';
-		for (let i = 0 ; i < MEASURE_COUNT ; i++) {
+		for (let i = 0 ; i < MEASURE_COUNT - 1 ; i++) {
 			let x = MEASURE_SIZE * (i + 1) + '%';
 			CREATOR.create.svg('line', {x1: x, y1: y1, x2: x, y2: y2, stroke: COLORS.gray.line, 'stroke-width': BAR_STROKE_WIDTH}, svg);
 		}
@@ -234,7 +235,7 @@
 					filled = true;
 				}
 				let cx = startX + BEAT_SIZES*(i + 1) + '%';
-				let cy = (startY - SPACE_SIZE*1.5) + (SPACE_SIZE/2)*j;
+				let cy = (startY - SPACE_SIZE*(EXTRA_LINES_COUNT + 0.5)) + (SPACE_SIZE/2)*j;
 				let y1 = cy;
 				let group = CREATOR.create.svg('g', {name: i + k * MEASURE_BEATS + 1, stroke: COLORS.black.line, fill: fillColor, filled: filled}, svg);
 				let circle = CREATOR.create.svg('ellipse', {cx: cx, cy: cy + '%', ry: SPACE_SIZE/2.5 + '%', 'stroke-width': NOTE_STROKE_WIDTH}, group);
@@ -246,23 +247,27 @@
 					let x, y2;
 					if (j < POSSIBLE_NOTES_COUNT / 2) {
 						x = startX - deltaX + BEAT_SIZES*(i + 1) + '%';
-						y2 = (startY + SPACE_SIZE*3) + (SPACE_SIZE/2)*(j - 4) + '%';
+						y2 = (startY + SPACE_SIZE*(4 - EXTRA_LINES_COUNT)) + (SPACE_SIZE/2)*(j - 4) + '%';
 					} else {
 						x = startX + deltaX + BEAT_SIZES*(i + 1) + '%';
-						y2 = (startY - SPACE_SIZE*4) + (SPACE_SIZE/2)*j + '%';
+						y2 = (startY - SPACE_SIZE*(3 + EXTRA_LINES_COUNT)) + (SPACE_SIZE/2)*j + '%';
 					}
 					CREATOR.create.svg('line', {x1: x, y1: y1 + '%', x2: x, y2: y2, 'stroke-width': NOTE_STROKE_WIDTH}, group);
 				}
 				if (j <= EXTRA_LINES_LIMITS[0] || j >= EXTRA_LINES_LIMITS[1]) {
 					let x1 = startX + BEAT_SIZES*(i + 1) - deltaX*2 + '%';
 					let x2 = startX + BEAT_SIZES*(i + 1) + deltaX*2 + '%';
-					let deltaY;
-					if (j % 2 == 0) {
-						deltaY = SPACE_SIZE/2 * (j < POSSIBLE_NOTES_COUNT / 2 ? 1 : -1);
-					} else {
-						deltaY = 0;
+					while (j <= (EXTRA_LINES_COUNT + 1) || j >= (11 + EXTRA_LINES_COUNT * 2)) {
+						let deltaY;
+						if (j % 2 == 0) {
+							deltaY = SPACE_SIZE/2 * (j < POSSIBLE_NOTES_COUNT / 2 ? 1 : -1);
+						} else {
+							deltaY = 0;
+						}
+						CREATOR.create.svg('line', {x1: x1, y1: y1 + deltaY + '%', x2: x2, y2: y1 + deltaY + '%', stroke: COLORS.black.line, 'stroke-width': LINE_STROKE_WIDTH, name: 'extra'}, svg);
+						j += 2 * (j <= (EXTRA_LINES_COUNT + 1) ? 1 : -1);
+						y1 = (startY - SPACE_SIZE*(EXTRA_LINES_COUNT + 0.5)) + (SPACE_SIZE/2)*j;
 					}
-					CREATOR.create.svg('line', {x1: x1, y1: y1 + deltaY + '%', x2: x2, y2: y1 + deltaY + '%', stroke: COLORS.black.line, 'stroke-width': LINE_STROKE_WIDTH, name: 'extra'}, svg);
 				}
 				group.remove();
 				svg.appendChild(group);
