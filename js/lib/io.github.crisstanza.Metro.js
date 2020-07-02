@@ -91,7 +91,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 		return AUDIO_POOL[name].pop() || newAudio(name);
 	};
 
-	io.github.crisstanza.Metro.prototype.notifyCallback = function(event) {
+	io.github.crisstanza.Metro.prototype.notifyCallback = function(event, payload) {
 		if (this.callback) {
 			if (event == 'willStart') {
 				this.callback.willStart(this.beat);
@@ -115,8 +115,16 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 
 			} else if (event == 'justChangedMeasureBeats') {
 				this.callback.justChangedMeasureBeats(this.measureBeats);
+
+			} else if (event == 'justChangedExtraLines') {
+				this.callback.justChangedExtraLines(payload);
 			}
 		}
+	};
+
+	io.github.crisstanza.Metro.prototype.rbExtraLines_OnChange = function(event) {
+		let rbExtraLinesCurrent = event.target;
+		this.notifyCallback('justChangedExtraLines', rbExtraLinesCurrent.value * 1);
 	};
 
 	io.github.crisstanza.Metro.prototype.rbBeats_OnChange = function(event) {

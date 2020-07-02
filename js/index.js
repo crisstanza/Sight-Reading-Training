@@ -7,7 +7,7 @@
 	let MEASURE_BEATS = 4;
 	let BEAT_SIZES = MEASURE_SIZE / (MEASURE_BEATS + 1);
 
-	let EXTRA_LINES_COUNT = 2;
+	let EXTRA_LINES_COUNT = 0;
 	let POSSIBLE_NOTES_COUNT = 11 + EXTRA_LINES_COUNT * 4;
 	let EXTRA_LINES_LIMITS = [EXTRA_LINES_COUNT * 2 - 1, 11 + EXTRA_LINES_COUNT * 2];
 
@@ -37,6 +37,12 @@
 		MEASURE_BEATS = measureBeats;
 		MEASURE_SIZE = 100 / MEASURE_COUNT;
 		BEAT_SIZES = MEASURE_SIZE / (MEASURE_BEATS + 1);
+	}
+
+	function updateGlobalsExtraLines(extraLines) {
+		EXTRA_LINES_COUNT = extraLines;
+		POSSIBLE_NOTES_COUNT = 11 + EXTRA_LINES_COUNT * 4;
+		EXTRA_LINES_LIMITS = [EXTRA_LINES_COUNT * 2 - 1, 11 + EXTRA_LINES_COUNT * 2];
 	}
 
 	function drawBars(startY) {
@@ -154,6 +160,10 @@
 			justChangedMeasureBeats: function(measureBeats) {
 				updateGlobals(MEASURE_COUNT, measureBeats);
 				drawEmptyStaff();
+			},
+
+			justChangedExtraLines: function(extraLines) {
+				updateGlobalsExtraLines(extraLines);
 			}
 		};
 		METRO = new io.github.crisstanza.Metro(callback, MEASURE_COUNT, MEASURE_BEATS);
