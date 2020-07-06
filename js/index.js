@@ -184,6 +184,7 @@
 	}
 
 	function drawRests(middleY, targetK, targetI) {
+		let restPath = 'M -1 -17 L 6 -10 L 0 -2 L 6 4 Q -10 4 8 18 Q -16 2 2 2 L -4 -4 L 2 -12 L -2 -16 L -2 -17 L -1 -17 L 0 -16';
 		for (let k = 0 ; k < MEASURE_COUNT ; k++) {
 			if (targetK == undefined || targetK == k) {
 				let startX = BEAT_SIZES * k * (MEASURE_BEATS + 1);
@@ -191,11 +192,13 @@
 					if (targetI == undefined || targetI == i) {
 						let cx = startX + BEAT_SIZES*(i + 1);
 						let circle = CREATOR.create.svg('ellipse', {cx: cx + '%', cy: middleY + '%', ry: SPACE_SIZE + '%', 'stroke-width': NOTE_STROKE_WIDTH}, svg);
-						let circleHeight = circle.getBoundingClientRect().height;
-						let circleX = circle.getBoundingClientRect().x + circleHeight/2.5;
-						let circleY = circle.getBoundingClientRect().y + circleHeight/2.5;
+						let circleRadius = circle.getBoundingClientRect().height / 2;
+						circle.setAttribute('rx', circleRadius);
+						let circleWidth = circle.getBoundingClientRect().width;
+						let circleX = circle.getBoundingClientRect().x + circleWidth/2.5;
+						let circleY = circle.getBoundingClientRect().y + circleWidth/2.5;
 						circle.remove();
-						let pathData = changePathData('M -1 -17 L 6 -10 L 0 -2 L 6 4 Q -10 4 8 18 Q -16 2 2 2 L -4 -4 L 2 -12 L -2 -16 L -2 -17 L -1 -17 L 0 -16', circleHeight/45, circleX, circleY);
+						let pathData = changePathData(restPath, circleWidth/45, circleX, circleY);
 						let rest = CREATOR.create.svg('path', {d: pathData, fill: COLORS.black.fill, stroke: COLORS.black.line, 'stroke-width': NOTE_STROKE_WIDTH, filled: true}, svg);
 					}
 				}
