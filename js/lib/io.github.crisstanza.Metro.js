@@ -9,17 +9,27 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 	let MIN_MEASURES = 1;
 	let MAX_MEASURES = 8;
 
+	let AUDIO_FORMAT = 'mp3';
+
 	function newAudio(name) {
-		let audio = new Audio('audio/' + name + '.mp3');
+		let audio = new Audio('audio/' + name + '.' + AUDIO_FORMAT);
 		audio.preload = true;
 		audio.addEventListener('ended', function() { AUDIO_POOL[name].push(audio); });
 		return audio;
 	}
 
 	let AUDIO_POOL = {
-		'0.5': [ newAudio('0.5') ],
-		'1': [ newAudio('1') ],
-		'234': [ newAudio('234') ]
+		'0.5': [],
+		'1': [],
+		'234': [],
+		'4': []
+	};
+
+	let AUDIO_MIX = {
+		'0.5': ['0.5'],
+		'1': ['1'],
+		'234': ['234'],
+		'4': ['1', '4']
 	};
 
 	io.github.crisstanza.Metro = function(callback, measureCount, measureBeats) {
@@ -49,14 +59,17 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 	};
 
 	io.github.crisstanza.Metro.prototype.play = function() {
+		let _this = this;
 		if (this.beat != 0) {
 			if (this.beat < this.maxBeat) {
-				let audio = this.findCurrentAudio();
+				let audioMix = this.findCurrentAudioMix();
 				this.notifyCallback('willPlay');
-				audio.play();
+				audioMix.forEach(function (name) {
+					let audio = _this.findAudio(name);
+					audio.play();
+				});
 				this.lastBeat = this.beat;
 				this.notifyCallback('justPlayed');
-				let _this = this;
 				setTimeout(function() { _this.play(); }, this.delay);
 				this.incBeat();
 			} else {
@@ -79,16 +92,22 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 		}
 	};
 
-	io.github.crisstanza.Metro.prototype.findCurrentAudio = function() {
+	io.github.crisstanza.Metro.prototype.findAudio = function(name) {
+		return AUDIO_POOL[name].pop() || newAudio(name);
+	};
+
+	io.github.crisstanza.Metro.prototype.findCurrentAudioMix = function() {
 		let name;
 		if (this.beat < 0 || this.beat % 1 == 0.5) {
 			name = '0.5';
 		} else if (this.beat % this.measureBeats == 1) {
 			name = '1';
+		} else if (this.beat == this.maxBeat - 1) {
+			name = '4';
 		} else {
 			name = '234';
 		}
-		return AUDIO_POOL[name].pop() || newAudio(name);
+		return AUDIO_MIX[name];
 	};
 
 	io.github.crisstanza.Metro.prototype.notifyCallback = function(event, payload) {
