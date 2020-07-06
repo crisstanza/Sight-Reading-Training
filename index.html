@@ -16,7 +16,7 @@
 		<script src="js/index.js?v=1.0.0"></script>
 	</head>
 	<body data-autos="ids, names">
-		<div class="metro-control">
+		<div class="controls metro-control">
 			<label class="intro"><input id="cb-intro" type="checkbox" checked="checked" /> intro</label>
 			<label class="speed"><input id="in-speed" type="number" value="60" maxlength="3" /> bpm</label>
 			<label class="buttons">
@@ -28,17 +28,22 @@
 			<label class="beats"><input name="rb-beats" type="radio" value="8" /> 8</label>
 			<label class="repeat"><input id="cb-repeat" type="checkbox" /> repeat</label>
 		</div>
-		<div class="staff-control">
+		<div class="controls staff-control">
 			additional lines:
 			<label class="lines"><input name="rb-extra-lines" type="radio" value="0" checked="checked" /> 0</label>
 			<label class="lines"><input name="rb-extra-lines" type="radio" value="1" /> 1</label>
 			<label class="lines"><input name="rb-extra-lines" type="radio" value="2" /> 2</label>
 		</div>
-		<div class="audio-format-control">
+		<div class="controls audio-format-control">
 			audio format:
 			<label class="lines"><input name="rb-audio-format" type="radio" value="aif" /> .aif</label>
 			<label class="lines"><input name="rb-audio-format" type="radio" value="mp3" checked="checked" /> .mp3</label>
 			<label class="lines"><input name="rb-audio-format" type="radio" value="wav" /> .wav</label>
+		</div>
+		<div class="controls audio-quality-control">
+			audio quality:
+			<label class="lines"><input name="rb-audio-quality" type="radio" value="high" /> high</label>
+			<label class="lines"><input name="rb-audio-quality" type="radio" value="low" checked="checked" /> low</label>
 		</div>
 		<button class="measure-del" id="bt-del-measure">-</button>
 		<button class="measure-add" id="bt-add-measure">+</button>

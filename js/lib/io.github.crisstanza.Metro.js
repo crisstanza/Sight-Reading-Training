@@ -9,33 +9,30 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 	let MIN_MEASURES = 1;
 	let MAX_MEASURES = 8;
 
-	function newAudio(name, audioFormat) {
-		let audio = new Audio('audio/' + name + '.' + audioFormat);
+	function newAudio(name, audioFormat, audioQuality) {
+		let audio = new Audio('audio/' + name + '-' + audioQuality + '.' + audioFormat);
 		audio.preload = true;
-		audio.addEventListener('ended', () => { AUDIO_POOL[audioFormat][name].push(audio); });
+		audio.addEventListener('ended', () => { AUDIO_POOL[audioFormat][audioQuality][name].push(audio); });
 		return audio;
 	}
 
-	let AUDIO_POOL = {
-		'aif': {
-			'0.5': [],
-			'1': [],
-			'234': [],
-			'4': []
-		},
-		'mp3': {
-			'0.5': [],
-			'1': [],
-			'234': [],
-			'4': []
-		},
-		'wav': {
-			'0.5': [],
-			'1': [],
-			'234': [],
-			'4': []
-		}
-	};
+	let POSSIBLE_AUDIO_FORMATS = [ 'aif', 'mp3', 'wav'];
+	let POSSIBLE_AUDIO_QUALITIES = [ 'high', 'low'];
+
+	let AUDIO_POOL = {};
+	(function() {
+		POSSIBLE_AUDIO_FORMATS.forEach(format => {
+			AUDIO_POOL[format] = {};
+			POSSIBLE_AUDIO_QUALITIES.forEach(quality => {
+				AUDIO_POOL[format][quality] = {
+					'0.5': [],
+					'1': [],
+					'234': [],
+					'4': []
+				};
+			});
+		});
+	})();
 
 	let AUDIO_MIX = {
 		'0.5': ['0.5'],
@@ -51,6 +48,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 		this.beat = 0;
 		this.lastBeat = 0;
 		this.audioFormat = 'mp3';
+		this.audioQuality = 'low';
 	};
 
 	io.github.crisstanza.Metro.prototype.gui = function(inSpeed, btStart, btStop, rbBeats, cbIntro, cbRepeat, btDelMeasure, btAddMeasure) {
@@ -105,7 +103,7 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 	};
 
 	io.github.crisstanza.Metro.prototype.findAudio = function(name) {
-		return AUDIO_POOL[this.audioFormat][name].pop() || newAudio(name, this.audioFormat);
+		return AUDIO_POOL[this.audioFormat][this.audioQuality][name].pop() || newAudio(name, this.audioFormat, this.audioQuality);
 	};
 
 	io.github.crisstanza.Metro.prototype.findCurrentAudioMix = function() {
@@ -161,6 +159,11 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 	io.github.crisstanza.Metro.prototype.rbAudioFormat_OnChange = function(event) {
 		let rbAudioFormatCurrent = event.target;
 		this.audioFormat = rbAudioFormatCurrent.value;
+	};
+
+	io.github.crisstanza.Metro.prototype.rbAudioQuality_OnChange = function(event) {
+		let rbAudioQualityCurrent = event.target;
+		this.audioQuality = rbAudioQualityCurrent.value;
 	};
 
 	io.github.crisstanza.Metro.prototype.rbBeats_OnChange = function(event) {
