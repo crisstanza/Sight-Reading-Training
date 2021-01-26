@@ -164,6 +164,11 @@
 
 			justChangedExtraLines: function(extraLines) {
 				updateGlobalsExtraLines(extraLines);
+			},
+
+			justChangedAudioFormat: function(audioFormat) {
+			},
+			justChangedAudioQuality: function(audioQuality) {
 			}
 		};
 		METRO = new io.github.crisstanza.Metro(callback, MEASURE_COUNT, MEASURE_BEATS);

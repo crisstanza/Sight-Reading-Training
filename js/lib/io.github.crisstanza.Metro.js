@@ -159,11 +159,13 @@ if (!io.github.crisstanza) io.github.crisstanza = {};
 	io.github.crisstanza.Metro.prototype.rbAudioFormat_OnChange = function(event) {
 		let rbAudioFormatCurrent = event.target;
 		this.audioFormat = rbAudioFormatCurrent.value;
+		this.notifyCallback('justChangedAudioFormat');
 	};
 
 	io.github.crisstanza.Metro.prototype.rbAudioQuality_OnChange = function(event) {
 		let rbAudioQualityCurrent = event.target;
 		this.audioQuality = rbAudioQualityCurrent.value;
+		this.notifyCallback('justChangedAudioQuality');
 	};
 
 	io.github.crisstanza.Metro.prototype.rbBeats_OnChange = function(event) {
